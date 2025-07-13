@@ -5,6 +5,3 @@ edition = "2024"
 
 [dependencies]
 macroquad = "0.4.14"
-
-[lib]
-crate-type = ["cdylib"]
