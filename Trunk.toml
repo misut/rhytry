@@ -1,7 +1,6 @@
 [build]
 filehash = false
 inject_scripts = false
-public_url = "/assets"
 
 [clean]
 dist = "dist"
