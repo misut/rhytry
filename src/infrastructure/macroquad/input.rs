@@ -1,16 +1,28 @@
 use crate::interface::input::Input;
 use crate::interface::key::Key;
+use crate::interface::keyboard::Keyboard;
 
 use macroquad::prelude::*;
+
+impl Keyboard {
+    fn key_code(&self) -> KeyCode {
+        match self {
+            Keyboard::D => KeyCode::D,
+            Keyboard::F => KeyCode::F,
+            Keyboard::J => KeyCode::J,
+            Keyboard::L => KeyCode::L,
+        }
+    }
+}
 
 impl Key {
     fn key_code(&self) -> KeyCode {
         match self {
             Key::Escape => KeyCode::Escape,
-            Key::LeftDon => KeyCode::F,
-            Key::RightDon => KeyCode::J,
-            Key::LeftKat => KeyCode::D,
-            Key::RightKat => KeyCode::K,
+            Key::LeftDon(kb) => kb.key_code(),
+            Key::RightDon(kb) => kb.key_code(),
+            Key::LeftKat(kb) => kb.key_code(),
+            Key::RightKat(kb) => kb.key_code(),
         }
     }
 }

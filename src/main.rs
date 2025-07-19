@@ -20,7 +20,7 @@ async fn main() {
         clear_background(LIGHTGRAY);
 
         let delta: f32 = get_frame_time() * 1000.;
-        if Key::LeftDon.down() {
+        if Key::LeftDon(interface::keyboard::Keyboard::D).down() {
             circle_x -= 0.1 * delta;
         }
         if circle_x < 0. {
