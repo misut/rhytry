@@ -2,11 +2,25 @@ use macroquad::prelude::*;
 
 #[macroquad::main("Rhytry")]
 async fn main() {
+    let box_width: f32 = 1280.;
+    let box_height: f32 = 720.;
+
+    let mut circle_x: f32 = 1280.;
+    let mut circle_y: f32 = 360.;
+    let texture = load_texture("./assets/don.png").await.unwrap();
+
     loop {
-        clear_background(BLACK);
+        clear_background(LIGHTGRAY);
 
-        draw_text("Hello from macroquad!", 20.0, 40.0, 30.0, WHITE);
+        let delta: f32 = get_frame_time() * 1000.;
+        circle_x -= 0.1 * delta;
+        if circle_x < 0. {
+            circle_x = 1280.;
+        }
 
-        next_frame().await;
+        draw_rectangle_lines(0., 0., box_width, box_height, 1., BLACK);
+        draw_circle(circle_x, circle_y, 15.0, RED);
+        draw_texture(&texture, circle_x, circle_y, WHITE);
+        next_frame().await
     }
 }

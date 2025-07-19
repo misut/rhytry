@@ -1,2 +1,10 @@
 [build]
+filehash = false
 inject_scripts = false
+public_url = "/assets"
+
+[clean]
+dist = "dist"
+
+[serve]
+address = "127.0.0.1"
