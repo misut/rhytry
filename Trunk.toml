@@ -3,4 +3,5 @@
 # https://trunkrs.dev/configuration/
 
 [build]
+# publick_url = "/rhytry"
 no_sri = true
