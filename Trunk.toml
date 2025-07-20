@@ -1,0 +1,6 @@
+# Trunk configuration
+# For full list of options, see:
+# https://trunkrs.dev/configuration/
+
+[build]
+no_sri = true

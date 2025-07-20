@@ -1,0 +1,17 @@
+# rustfmt configuration
+# For full list of options, see:
+# https://rust-lang.github.io/rustfmt/
+
+# --- Formatting Style Options ---
+edition = "2024"
+hard_tabs = false
+max_width = 100
+tab_spaces = 4
+use_small_heuristics = "Max"
+
+# --- Import Options ---
+group_imports = "StdExternalCrate"
+reorder_imports = true
+
+# --- Line Endings ---
+newline_style = "Unix"
