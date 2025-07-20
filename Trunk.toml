@@ -3,5 +3,6 @@
 # https://trunkrs.dev/configuration/
 
 [build]
-# public_url = "/rhytry"
+## TO-BE-ENABLED-IN-RELEASE ## public_url = "/rhytry"
+## TO-BE-ENABLED-IN-RELEASE ## release = true
 no_sri = true

@@ -26,8 +26,9 @@ jobs:
       - name: Add wasm target
         run: |
           rustup target add wasm32-unknown-unknown
-      - name: Setup public url
-        run: sed -i 's/# public_url/public_url/' Trunk.toml
+      - name: Enable release options
+        run: |
+          sed -i 's/^## TO-BE-ENABLED-IN-RELEASE ## //' Trunk.toml
       - name: Build Release
         run: |
           trunk build --release
