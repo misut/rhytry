@@ -7,4 +7,7 @@ edition = "2024"
 exclude = ["assets", "build", "dist"]
 
 [dependencies]
-bevy = "0.16.1"
+bevy = { version = "0.16.1", features = [
+    "bevy_asset",
+] }
+bevy_asset_loader = "0.23.0"
