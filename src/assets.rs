@@ -15,7 +15,6 @@ impl Plugin for LoadingPlugin {
     }
 }
 
-
 #[derive(AssetCollection, Resource)]
 pub struct TextureAssets {
     #[asset(path = "texture/onpu_don.png")]

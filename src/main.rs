@@ -1,8 +1,12 @@
 use bevy::{
-    asset::AssetMetaCheck, color::palettes::{
+    asset::AssetMetaCheck,
+    color::palettes::{
         basic::WHITE,
         css::{GREEN, RED},
-    }, math::ops::powf, prelude::*, render::camera::Viewport
+    },
+    math::ops::powf,
+    prelude::*,
+    render::camera::Viewport,
 };
 use rhytry::GamePlugin;
 
@@ -19,12 +23,8 @@ fn main() {
                         ..default()
                     }),
                     ..default()
-
                 })
-                .set(AssetPlugin {
-                    meta_check: AssetMetaCheck::Never,
-                    ..default()
-                }),
+                .set(AssetPlugin { meta_check: AssetMetaCheck::Never, ..default() }),
         )
         .add_plugins(GamePlugin)
         .add_systems(Startup, setup)
