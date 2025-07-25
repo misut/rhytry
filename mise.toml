@@ -1,3 +1,6 @@
+[tasks.check]
+run = "cargo check"
+
 [tasks."fmt:cargo"]
 description = "Format codes using cargo fmt"
 run = "cargo +nightly fmt"
