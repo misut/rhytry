@@ -1,3 +1,15 @@
+[tasks."fmt:cargo"]
+description = "Format codes using cargo fmt"
+run = "cargo +nightly fmt"
+
+[tasks."fmt:mise"]
+description = "Format codes using mise fmt"
+run = "mise fmt"
+
+[tasks.fmt]
+depends = ["fmt:*"]
+description = "Format codes using cargo and mise"
+
 [tools]
 "cargo:trunk" = "latest"
 rust = "latest"
