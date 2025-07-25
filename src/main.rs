@@ -8,7 +8,7 @@ use bevy::{
     prelude::*,
     render::camera::Viewport,
 };
-use rhytry::GamePlugin;
+use rhytry::infrastructure::bevy::game::GamePlugin;
 
 fn main() {
     App::new()

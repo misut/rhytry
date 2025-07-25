@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 
-use crate::GameState;
-use crate::assets::TextureAssets;
+use crate::{infrastructure::bevy::assets::TextureAssets, infrastructure::bevy::game::GameState};
 
 pub struct OnpuPlugin;
 
