@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{infrastructure::bevy::assets::TextureAssets, infrastructure::bevy::game::GameState};
+use crate::{infrastructure::bevy::app::AppState, infrastructure::bevy::assets::TextureAssets};
 
 pub struct OnpuPlugin;
 
@@ -9,7 +9,7 @@ pub struct Onpu;
 
 impl Plugin for OnpuPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Playing), spawn_onpu);
+        app.add_systems(OnEnter(AppState::Playing), spawn_onpu);
     }
 }
 

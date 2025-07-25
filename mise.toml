@@ -5,6 +5,10 @@ run = "cargo check"
 depends = ["check"]
 run = "gh workflow run deploy-github-page"
 
+[tasks.fix]
+depends = ["fmt"]
+run = "cargo +nightly fix --allow-dirty"
+
 [tasks."fmt:cargo"]
 description = "Format codes using cargo fmt"
 run = "cargo +nightly fmt"
