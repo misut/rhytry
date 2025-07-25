@@ -1,4 +1,7 @@
-use bevy::{app::{App, Plugin}, state::{app::AppExtStates, state::States}};
+use bevy::{
+    app::{App, Plugin},
+    state::{app::AppExtStates, state::States},
+};
 
 use crate::infrastructure::bevy::{assets::LoadingPlugin, onpu::OnpuPlugin};
 
