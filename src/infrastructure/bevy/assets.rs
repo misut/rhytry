@@ -19,4 +19,10 @@ impl Plugin for LoadingPlugin {
 pub struct TextureAssets {
     #[asset(path = "texture/onpu_don.png")]
     pub don: Handle<Image>,
+    #[asset(path = "texture/onpu_kat.png")]
+    pub kat: Handle<Image>,
+    #[asset(path = "texture/ooki_don.png")]
+    pub ooki_don: Handle<Image>,
+    #[asset(path = "texture/ooki_kat.png")]
+    pub ooki_kat: Handle<Image>,
 }
