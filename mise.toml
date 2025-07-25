@@ -1,6 +1,10 @@
 [tasks.check]
 run = "cargo check"
 
+[tasks.deploy]
+depends = ["check"]
+run = "gh workflow run deploy-github-page"
+
 [tasks."fmt:cargo"]
 description = "Format codes using cargo fmt"
 run = "cargo +nightly fmt"
