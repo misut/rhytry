@@ -4,7 +4,7 @@ use bevy::{ecs::system::Query, prelude::*, render::camera::Viewport};
 
 use crate::{infrastructure::bevy::app::AppState, infrastructure::bevy::assets::TextureAssets};
 
-pub struct OnpuPlugin;
+pub struct TaikoPlugin;
 
 #[derive(Component)]
 enum Onpu {
@@ -15,10 +15,10 @@ enum Onpu {
 #[derive(Resource, Default)]
 pub struct OnpuQueue(pub VecDeque<Entity>);
 
-impl Plugin for OnpuPlugin {
+impl Plugin for TaikoPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<OnpuQueue>()
-            .add_systems(OnEnter(AppState::Playing), (setup_taiko, spawn_onpu))
+            .add_systems(OnEnter(AppState::PlayingTaiko), (setup_taiko, spawn_onpu))
             .add_systems(Update, (hit_onpu, move_onpu, push_onpu_to_queue));
     }
 }

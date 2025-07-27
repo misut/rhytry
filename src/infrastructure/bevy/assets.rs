@@ -8,8 +8,8 @@ pub struct LoadingPlugin;
 impl Plugin for LoadingPlugin {
     fn build(&self, app: &mut App) {
         app.add_loading_state(
-            LoadingState::new(AppState::Loading)
-                .continue_to_state(AppState::Playing)
+            LoadingState::new(AppState::LoadingApp)
+                .continue_to_state(AppState::PlayingTaiko)
                 .load_collection::<TextureAssets>(),
         );
     }

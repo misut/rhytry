@@ -18,19 +18,5 @@ fn main() {
                 .set(AssetPlugin { meta_check: AssetMetaCheck::Never, ..default() }),
         )
         .add_plugins(AppPlugin)
-        .add_systems(Startup, setup)
         .run();
-}
-
-fn setup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-) {
-    // Add background to visualize viewport bounds
-    commands.spawn((
-        Mesh2d(meshes.add(Rectangle::new(50000.0, 50000.0))),
-        MeshMaterial2d(materials.add(Color::linear_rgb(0.01, 0.01, 0.01))),
-        Transform::from_translation(Vec3::new(0.0, 0.0, -200.0)),
-    ));
 }
