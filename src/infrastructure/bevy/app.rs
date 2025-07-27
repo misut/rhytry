@@ -16,8 +16,6 @@ pub struct AppPlugin;
 
 impl Plugin for AppPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .init_state::<AppState>()
-            .add_plugins((LoadingPlugin, TaikoPlugin, UiPlugin));
+        app.init_state::<AppState>().add_plugins((LoadingPlugin, TaikoPlugin, UiPlugin));
     }
 }

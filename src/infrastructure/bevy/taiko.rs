@@ -1,15 +1,24 @@
 use std::collections::VecDeque;
 
-use bevy::{ecs::system::Query, prelude::*, render::camera::Viewport};
+use bevy::{
+    ecs::{
+        component::{Mutable, StorageType},
+        system::Query,
+    },
+    prelude::*,
+    render::camera::Viewport,
+};
 
-use crate::{infrastructure::bevy::app::AppState, infrastructure::bevy::assets::TextureAssets};
+use crate::{
+    domain::taiko::{Fraction, Onpu},
+    infrastructure::bevy::{app::AppState, assets::TextureAssets},
+};
 
 pub struct TaikoPlugin;
 
-#[derive(Component)]
-enum Onpu {
-    Don,
-    Kat,
+impl Component for Onpu {
+    const STORAGE_TYPE: StorageType = StorageType::SparseSet;
+    type Mutability = Mutable;
 }
 
 #[derive(Resource, Default)]
@@ -61,19 +70,19 @@ fn spawn_onpu(mut commands: Commands, textures: Res<TextureAssets>) {
     commands.spawn((
         Sprite::from_image(textures.don.clone()),
         Transform::from_translation(Vec3::new(600., 0., 0.)),
-        Onpu::Don,
+        Onpu::Don(Fraction { denominator: 4, numerator: 1 }),
     ));
 
     commands.spawn((
         Sprite::from_image(textures.kat.clone()),
         Transform::from_translation(Vec3::new(900., 0., 0.)),
-        Onpu::Kat,
+        Onpu::Kat(Fraction { denominator: 4, numerator: 2 }),
     ));
 
     commands.spawn((
         Sprite::from_image(textures.don.clone()),
         Transform::from_translation(Vec3::new(1200., 0., 0.)),
-        Onpu::Don,
+        Onpu::Don(Fraction { denominator: 4, numerator: 3 }),
     ));
 }
 

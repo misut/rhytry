@@ -1,4 +1,7 @@
-use bevy::{color::palettes::css::{RED, WHITE}, prelude::*};
+use bevy::{
+    color::palettes::css::{RED, WHITE},
+    prelude::*,
+};
 
 const BACKGROUND_COLOR: Color = Color::linear_rgb(0.1, 0.1, 0.1);
 const BACKGROUND_POSITION: Vec3 = Vec3::new(0., 0., 0.);
@@ -8,8 +11,7 @@ pub struct UiPlugin;
 
 impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_systems(Startup, draw_background)
+        app.add_systems(Startup, draw_background)
             .add_systems(PostUpdate, draw_cursor.after(TransformSystem::TransformPropagate));
     }
 }
