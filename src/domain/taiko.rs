@@ -23,6 +23,7 @@ pub enum Hantei {
     Renda,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Onpu {
     Don(Fraction),
     Kat(Fraction),
@@ -32,29 +33,30 @@ pub enum Onpu {
     OokiRenda(Fraction, Fraction),
 }
 
-trait Beat {
-    fn diff(&self, other: &dyn Beat) -> f32 {
-        (self.index() - other.index()).abs()
-    }
+pub trait Beat {
+    fn at(&self) -> f32;
 
-    fn index(&self) -> f32;
+    fn diff(&self, other: &dyn Beat) -> f32 {
+        (self.at() - other.at()).abs()
+    }
 }
 
 pub struct Decimal(f32);
 
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Fraction {
     pub denominator: u32,
     pub numerator: u32,
 }
 
 impl Beat for Decimal {
-    fn index(&self) -> f32 {
+    fn at(&self) -> f32 {
         self.0
     }
 }
 
 impl Beat for Fraction {
-    fn index(&self) -> f32 {
+    fn at(&self) -> f32 {
         self.numerator as f32 / self.denominator as f32
     }
 }
@@ -115,15 +117,25 @@ impl Judge for Onpu {
                 }
             },
             Onpu::Renda(beg, end) | Onpu::OokiRenda(beg, end) =>
-                if tataki.beat.index() < beg.index() {
+                if tataki.beat.at() < beg.at() {
                     None
-                } else if tataki.beat.index() < end.index() {
+                } else if tataki.beat.at() < end.at() {
                     Some(Hantei::Renda)
                 } else {
                     None
                 }
         }
     }
+}
+
+pub struct Shousetsu(pub Vec<Onpu>);
+
+pub struct Fumen(pub Vec<Shousetsu>);
+
+#[derive(Debug, Default, Clone, Copy)]
+pub struct TaikoState {
+    pub beat_index: f32,
+    pub shousetsu_index: u32,
 }
 
 #[cfg(test)]

@@ -4,15 +4,26 @@ use bevy::{
     ecs::{
         component::{Mutable, StorageType},
         system::Query,
-    },
-    prelude::*,
-    render::camera::Viewport,
+    }, math::ops::fract, prelude::*, render::camera::Viewport
 };
 
 use crate::{
-    domain::taiko::{Fraction, Onpu},
+    domain::taiko::{Beat, Fraction, Onpu, TaikoState},
     infrastructure::bevy::{app::AppState, assets::TextureAssets},
 };
+
+const FETCHED_ONPU: [&'static Onpu; 10] = [
+    &Onpu::Don(Fraction { denominator: 8, numerator: 0 }),
+    &Onpu::Kat(Fraction { denominator: 8, numerator: 2 }),
+    &Onpu::Don(Fraction { denominator: 8, numerator: 4 }),
+    &Onpu::Don(Fraction { denominator: 8, numerator: 5 }),
+    &Onpu::Kat(Fraction { denominator: 8, numerator: 6 }),
+    &Onpu::Kat(Fraction { denominator: 8, numerator: 8 }),
+    &Onpu::Don(Fraction { denominator: 8, numerator: 10 }),
+    &Onpu::Kat(Fraction { denominator: 8, numerator: 12 }),
+    &Onpu::Kat(Fraction { denominator: 8, numerator: 13 }),
+    &Onpu::Don(Fraction { denominator: 8, numerator: 14 }),
+];
 
 pub struct TaikoPlugin;
 
@@ -24,12 +35,46 @@ impl Component for Onpu {
 #[derive(Resource, Default)]
 pub struct OnpuQueue(pub VecDeque<Entity>);
 
+#[derive(Resource, Default)]
+pub struct CurrentTaikoState(pub TaikoState);
+
 impl Plugin for TaikoPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<OnpuQueue>()
-            .add_systems(OnEnter(AppState::PlayingTaiko), (setup_taiko, spawn_onpu))
-            .add_systems(Update, (hit_onpu, move_onpu, push_onpu_to_queue));
+            .init_resource::<CurrentTaikoState>()
+            .add_systems(
+                OnEnter(AppState::PlayingTaiko),
+                (setup_taiko, spawn_onpu),
+            )
+            .add_systems(
+                Update,
+                (
+                    hit_onpu,
+                    move_onpu,
+                    push_onpu_to_queue,
+                    update_taiko_state,
+                ),
+            );
     }
+}
+
+fn update_taiko_state(time: Res<Time>, mut taiko_state: ResMut<CurrentTaikoState>) {
+    const BPM: f32 = 100.0;
+    const BEATS_PER_SHOUSETSU: f32 = 4.0; // Assuming 4/4 time signature
+
+    let beat_duration = 60.0 / BPM;
+    let shousetsu_duration = beat_duration * BEATS_PER_SHOUSETSU;
+
+    let elapsed_time = time.elapsed_secs();
+
+    let current_shousetsu_index = (elapsed_time / shousetsu_duration) as u32;
+    let time_in_current_shousetsu = elapsed_time % shousetsu_duration;
+    let current_beat_index = time_in_current_shousetsu / beat_duration;
+
+    taiko_state.0 = TaikoState {
+        shousetsu_index: current_shousetsu_index,
+        beat_index: current_beat_index,
+    };
 }
 
 fn setup_taiko(
@@ -66,29 +111,36 @@ fn push_onpu_to_queue(query: Query<Entity, Added<Onpu>>, mut queue: ResMut<OnpuQ
     }
 }
 
+const BPS: f32 = 100.0 / 60.0; // Beats per second
+const BEATS_PER_SHOUSETSU: f32 = 4.0; // Assuming 4/4 time signature
+const SCROLL_SPEED: f32 = 400.0; // Pixels per second
+const START_OFFSET: f32 = 100.0; // Initial offset for onpus
+
 fn spawn_onpu(mut commands: Commands, textures: Res<TextureAssets>) {
-    commands.spawn((
-        Sprite::from_image(textures.don.clone()),
-        Transform::from_translation(Vec3::new(600., 0., 0.)),
-        Onpu::Don(Fraction { denominator: 4, numerator: 1 }),
-    ));
-
-    commands.spawn((
-        Sprite::from_image(textures.kat.clone()),
-        Transform::from_translation(Vec3::new(900., 0., 0.)),
-        Onpu::Kat(Fraction { denominator: 4, numerator: 2 }),
-    ));
-
-    commands.spawn((
-        Sprite::from_image(textures.don.clone()),
-        Transform::from_translation(Vec3::new(1200., 0., 0.)),
-        Onpu::Don(Fraction { denominator: 4, numerator: 3 }),
-    ));
+    for &onpu in FETCHED_ONPU.iter() {
+        match *onpu {
+            Onpu::Don(fraction) => {
+                commands.spawn((
+                    Sprite::from_image(textures.don.clone()),
+                    Transform::from_translation(Vec3::new(START_OFFSET + fraction.at() * SCROLL_SPEED / BPS * BEATS_PER_SHOUSETSU, 0., 0.)),
+                    onpu.clone(),
+                ));
+            }
+            Onpu::Kat(fraction) => {
+                commands.spawn((
+                    Sprite::from_image(textures.kat.clone()),
+                    Transform::from_translation(Vec3::new(START_OFFSET + fraction.at() * SCROLL_SPEED / BPS * BEATS_PER_SHOUSETSU, 0., 0.)),
+                    onpu.clone(),
+                ));
+            }
+            _ => {}
+        }
+    }
 }
 
 fn move_onpu(time: Res<Time>, mut positions: Query<(&mut Onpu, &mut Transform)>) {
     for (mut _onpu, mut transform) in &mut positions {
-        transform.translation.x -= 200.0 * time.delta_secs();
+        transform.translation.x -= SCROLL_SPEED * time.delta_secs();
     }
 }
 
