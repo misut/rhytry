@@ -1,18 +1,18 @@
-enum Datten {
+pub enum Datten {
     Fuchi,
     Men,
 }
 
-enum Uchite {
+pub enum Uchite {
     Hidari,
     Migi,
     Ryou,
 }
 
-struct Tataki {
-    beat: Decimal,
-    datten: Datten,
-    uchite: Uchite,
+pub struct Tataki {
+    pub beat: Decimal,
+    pub datten: Datten,
+    pub uchite: Uchite,
 }
 
 #[derive(Debug, PartialEq)]
@@ -41,7 +41,7 @@ pub trait Beat {
     }
 }
 
-pub struct Decimal(f32);
+pub struct Decimal(pub f32);
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Fraction {
@@ -63,7 +63,7 @@ impl Beat for Fraction {
 
 const JUDGE_THRESHOLD: f32 = 0.1;
 
-trait Judge {
+pub trait Judge {
     fn judge(&self, tataki: &Tataki) -> Option<Hantei>;
 }
 
@@ -79,7 +79,7 @@ impl Judge for Onpu {
                         } else {
                             Some(Hantei::Fuka)
                         }
-                    },
+                    }
                     Datten::Men => {
                         if diff > JUDGE_THRESHOLD {
                             None
@@ -92,7 +92,7 @@ impl Judge for Onpu {
                         }
                     }
                 }
-            },
+            }
             Onpu::Kat(beat) | Onpu::OokiKat(beat) => {
                 let diff: f32 = beat.diff(&tataki.beat);
                 match tataki.datten {
@@ -106,7 +106,7 @@ impl Judge for Onpu {
                         } else {
                             Some(Hantei::Ryou)
                         }
-                    },
+                    }
                     Datten::Men => {
                         if diff > JUDGE_THRESHOLD {
                             None
@@ -115,8 +115,8 @@ impl Judge for Onpu {
                         }
                     }
                 }
-            },
-            Onpu::Renda(beg, end) | Onpu::OokiRenda(beg, end) =>
+            }
+            Onpu::Renda(beg, end) | Onpu::OokiRenda(beg, end) => {
                 if tataki.beat.at() < beg.at() {
                     None
                 } else if tataki.beat.at() < end.at() {
@@ -124,6 +124,7 @@ impl Judge for Onpu {
                 } else {
                     None
                 }
+            }
         }
     }
 }
@@ -146,16 +147,41 @@ mod tests {
     fn should_be_none() {
         // Given
         let onpu_and_tataki: Vec<(Onpu, Tataki)> = vec![
-            (Onpu::Don(Fraction { denominator: 4, numerator: 1 }), Tataki { beat: Decimal(0.), datten: Datten::Men, uchite: Uchite::Hidari }),  // Early don
-            (Onpu::Don(Fraction { denominator: 4, numerator: 1 }), Tataki { beat: Decimal(0.5), datten: Datten::Men, uchite: Uchite::Hidari }),  // Late don
-            (Onpu::Kat(Fraction { denominator: 4, numerator: 1 }), Tataki { beat: Decimal(0.), datten: Datten::Fuchi, uchite: Uchite::Hidari }),  // Early kat
-            (Onpu::Kat(Fraction { denominator: 4, numerator: 1 }), Tataki { beat: Decimal(0.5), datten: Datten::Fuchi, uchite: Uchite::Hidari }),  // Late kat
-            (Onpu::Renda(Fraction { denominator: 4, numerator: 1 }, Fraction { denominator: 4, numerator: 2 }), Tataki { beat: Decimal(0.), datten: Datten::Fuchi, uchite: Uchite::Hidari }),  // Early renda
-            (Onpu::Renda(Fraction { denominator: 4, numerator: 1 }, Fraction { denominator: 4, numerator: 2 }), Tataki { beat: Decimal(0.5), datten: Datten::Fuchi, uchite: Uchite::Hidari }),  // Late renda
+            (
+                Onpu::Don(Fraction { denominator: 4, numerator: 1 }),
+                Tataki { beat: Decimal(0.), datten: Datten::Men, uchite: Uchite::Hidari },
+            ), // Early don
+            (
+                Onpu::Don(Fraction { denominator: 4, numerator: 1 }),
+                Tataki { beat: Decimal(0.5), datten: Datten::Men, uchite: Uchite::Hidari },
+            ), // Late don
+            (
+                Onpu::Kat(Fraction { denominator: 4, numerator: 1 }),
+                Tataki { beat: Decimal(0.), datten: Datten::Fuchi, uchite: Uchite::Hidari },
+            ), // Early kat
+            (
+                Onpu::Kat(Fraction { denominator: 4, numerator: 1 }),
+                Tataki { beat: Decimal(0.5), datten: Datten::Fuchi, uchite: Uchite::Hidari },
+            ), // Late kat
+            (
+                Onpu::Renda(
+                    Fraction { denominator: 4, numerator: 1 },
+                    Fraction { denominator: 4, numerator: 2 },
+                ),
+                Tataki { beat: Decimal(0.), datten: Datten::Fuchi, uchite: Uchite::Hidari },
+            ), // Early renda
+            (
+                Onpu::Renda(
+                    Fraction { denominator: 4, numerator: 1 },
+                    Fraction { denominator: 4, numerator: 2 },
+                ),
+                Tataki { beat: Decimal(0.5), datten: Datten::Fuchi, uchite: Uchite::Hidari },
+            ), // Late renda
         ];
 
         // When
-        let results: Vec<Option<Hantei>> = onpu_and_tataki.iter().map(|(onpu, tataki)| onpu.judge(tataki)).collect();
+        let results: Vec<Option<Hantei>> =
+            onpu_and_tataki.iter().map(|(onpu, tataki)| onpu.judge(tataki)).collect();
 
         // Then
         assert!(results.iter().all(|result| result.is_none()));
@@ -165,16 +191,35 @@ mod tests {
     fn should_be_fuka() {
         // Given
         let onpu_and_tataki: Vec<(Onpu, Tataki)> = vec![
-            (Onpu::Don(Fraction { denominator: 4, numerator: 1 }), Tataki { beat: Decimal(0.15), datten: Datten::Men, uchite: Uchite::Hidari }),  // Early don
-            (Onpu::Don(Fraction { denominator: 4, numerator: 1 }), Tataki { beat: Decimal(0.25), datten: Datten::Fuchi, uchite: Uchite::Hidari }),  // Fuchi when don
-            (Onpu::Don(Fraction { denominator: 4, numerator: 1 }), Tataki { beat: Decimal(0.35), datten: Datten::Men, uchite: Uchite::Hidari }),  // Late don
-            (Onpu::Kat(Fraction { denominator: 4, numerator: 1 }), Tataki { beat: Decimal(0.15), datten: Datten::Fuchi, uchite: Uchite::Hidari }),  // Early kat
-            (Onpu::Kat(Fraction { denominator: 4, numerator: 1 }), Tataki { beat: Decimal(0.25), datten: Datten::Men, uchite: Uchite::Hidari }),  // Men when kat
-            (Onpu::Kat(Fraction { denominator: 4, numerator: 1 }), Tataki { beat: Decimal(0.35), datten: Datten::Fuchi, uchite: Uchite::Hidari }),  // Late kat
+            (
+                Onpu::Don(Fraction { denominator: 4, numerator: 1 }),
+                Tataki { beat: Decimal(0.15), datten: Datten::Men, uchite: Uchite::Hidari },
+            ), // Early don
+            (
+                Onpu::Don(Fraction { denominator: 4, numerator: 1 }),
+                Tataki { beat: Decimal(0.25), datten: Datten::Fuchi, uchite: Uchite::Hidari },
+            ), // Fuchi when don
+            (
+                Onpu::Don(Fraction { denominator: 4, numerator: 1 }),
+                Tataki { beat: Decimal(0.35), datten: Datten::Men, uchite: Uchite::Hidari },
+            ), // Late don
+            (
+                Onpu::Kat(Fraction { denominator: 4, numerator: 1 }),
+                Tataki { beat: Decimal(0.15), datten: Datten::Fuchi, uchite: Uchite::Hidari },
+            ), // Early kat
+            (
+                Onpu::Kat(Fraction { denominator: 4, numerator: 1 }),
+                Tataki { beat: Decimal(0.25), datten: Datten::Men, uchite: Uchite::Hidari },
+            ), // Men when kat
+            (
+                Onpu::Kat(Fraction { denominator: 4, numerator: 1 }),
+                Tataki { beat: Decimal(0.35), datten: Datten::Fuchi, uchite: Uchite::Hidari },
+            ), // Late kat
         ];
 
         // When
-        let results: Vec<Option<Hantei>> = onpu_and_tataki.iter().map(|(onpu, tataki)| onpu.judge(tataki)).collect();
+        let results: Vec<Option<Hantei>> =
+            onpu_and_tataki.iter().map(|(onpu, tataki)| onpu.judge(tataki)).collect();
 
         // Then
         assert!(results.iter().all(|result| result == &Some(Hantei::Fuka)));
@@ -184,14 +229,27 @@ mod tests {
     fn should_be_ka() {
         // Given
         let onpu_and_tataki: Vec<(Onpu, Tataki)> = vec![
-            (Onpu::Don(Fraction { denominator: 4, numerator: 1 }), Tataki { beat: Decimal(0.2), datten: Datten::Men, uchite: Uchite::Hidari }),  // Early don
-            (Onpu::Don(Fraction { denominator: 4, numerator: 1 }), Tataki { beat: Decimal(0.2999), datten: Datten::Men, uchite: Uchite::Hidari }),  // Late don
-            (Onpu::Kat(Fraction { denominator: 4, numerator: 1 }), Tataki { beat: Decimal(0.2), datten: Datten::Fuchi, uchite: Uchite::Hidari }),  // Early kat
-            (Onpu::Kat(Fraction { denominator: 4, numerator: 1 }), Tataki { beat: Decimal(0.2999), datten: Datten::Fuchi, uchite: Uchite::Hidari }),  // Late kat
+            (
+                Onpu::Don(Fraction { denominator: 4, numerator: 1 }),
+                Tataki { beat: Decimal(0.2), datten: Datten::Men, uchite: Uchite::Hidari },
+            ), // Early don
+            (
+                Onpu::Don(Fraction { denominator: 4, numerator: 1 }),
+                Tataki { beat: Decimal(0.2999), datten: Datten::Men, uchite: Uchite::Hidari },
+            ), // Late don
+            (
+                Onpu::Kat(Fraction { denominator: 4, numerator: 1 }),
+                Tataki { beat: Decimal(0.2), datten: Datten::Fuchi, uchite: Uchite::Hidari },
+            ), // Early kat
+            (
+                Onpu::Kat(Fraction { denominator: 4, numerator: 1 }),
+                Tataki { beat: Decimal(0.2999), datten: Datten::Fuchi, uchite: Uchite::Hidari },
+            ), // Late kat
         ];
 
         // When
-        let results: Vec<Option<Hantei>> = onpu_and_tataki.iter().map(|(onpu, tataki)| onpu.judge(tataki)).collect();
+        let results: Vec<Option<Hantei>> =
+            onpu_and_tataki.iter().map(|(onpu, tataki)| onpu.judge(tataki)).collect();
 
         // Then
         assert!(results.iter().all(|result| result == &Some(Hantei::Ka)));
@@ -201,14 +259,27 @@ mod tests {
     fn should_be_ryou() {
         // Given
         let onpu_and_tataki: Vec<(Onpu, Tataki)> = vec![
-            (Onpu::Don(Fraction { denominator: 4, numerator: 1 }), Tataki { beat: Decimal(0.25), datten: Datten::Men, uchite: Uchite::Hidari }),
-            (Onpu::OokiDon(Fraction { denominator: 4, numerator: 1 }), Tataki { beat: Decimal(0.25), datten: Datten::Men, uchite: Uchite::Hidari }),
-            (Onpu::Kat(Fraction { denominator: 4, numerator: 1 }), Tataki { beat: Decimal(0.25), datten: Datten::Fuchi, uchite: Uchite::Hidari }),
-            (Onpu::OokiKat(Fraction { denominator: 4, numerator: 1 }), Tataki { beat: Decimal(0.25), datten: Datten::Fuchi, uchite: Uchite::Hidari }),
+            (
+                Onpu::Don(Fraction { denominator: 4, numerator: 1 }),
+                Tataki { beat: Decimal(0.25), datten: Datten::Men, uchite: Uchite::Hidari },
+            ),
+            (
+                Onpu::OokiDon(Fraction { denominator: 4, numerator: 1 }),
+                Tataki { beat: Decimal(0.25), datten: Datten::Men, uchite: Uchite::Hidari },
+            ),
+            (
+                Onpu::Kat(Fraction { denominator: 4, numerator: 1 }),
+                Tataki { beat: Decimal(0.25), datten: Datten::Fuchi, uchite: Uchite::Hidari },
+            ),
+            (
+                Onpu::OokiKat(Fraction { denominator: 4, numerator: 1 }),
+                Tataki { beat: Decimal(0.25), datten: Datten::Fuchi, uchite: Uchite::Hidari },
+            ),
         ];
 
         // When
-        let results: Vec<Option<Hantei>> = onpu_and_tataki.iter().map(|(onpu, tataki)| onpu.judge(tataki)).collect();
+        let results: Vec<Option<Hantei>> =
+            onpu_and_tataki.iter().map(|(onpu, tataki)| onpu.judge(tataki)).collect();
 
         // Then
         assert!(results.iter().all(|result| result == &Some(Hantei::Ryou)));
@@ -218,12 +289,25 @@ mod tests {
     fn should_be_renda() {
         // Given
         let onpu_and_tataki: Vec<(Onpu, Tataki)> = vec![
-            (Onpu::Renda(Fraction { denominator: 4, numerator: 1 }, Fraction { denominator: 4, numerator: 2 }), Tataki { beat: Decimal(0.25), datten: Datten::Fuchi, uchite: Uchite::Hidari }),
-            (Onpu::OokiRenda(Fraction { denominator: 4, numerator: 1 }, Fraction { denominator: 4, numerator: 2 }), Tataki { beat: Decimal(0.25), datten: Datten::Fuchi, uchite: Uchite::Hidari }),
+            (
+                Onpu::Renda(
+                    Fraction { denominator: 4, numerator: 1 },
+                    Fraction { denominator: 4, numerator: 2 },
+                ),
+                Tataki { beat: Decimal(0.25), datten: Datten::Fuchi, uchite: Uchite::Hidari },
+            ),
+            (
+                Onpu::OokiRenda(
+                    Fraction { denominator: 4, numerator: 1 },
+                    Fraction { denominator: 4, numerator: 2 },
+                ),
+                Tataki { beat: Decimal(0.25), datten: Datten::Fuchi, uchite: Uchite::Hidari },
+            ),
         ];
 
         // When
-        let results: Vec<Option<Hantei>> = onpu_and_tataki.iter().map(|(onpu, tataki)| onpu.judge(tataki)).collect();
+        let results: Vec<Option<Hantei>> =
+            onpu_and_tataki.iter().map(|(onpu, tataki)| onpu.judge(tataki)).collect();
 
         // Then
         assert!(results.iter().all(|result| result == &Some(Hantei::Renda)));
