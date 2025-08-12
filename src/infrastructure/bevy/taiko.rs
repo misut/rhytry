@@ -124,7 +124,7 @@ fn spawn_onpu(
     textures: Res<TextureAssets>,
     taiko_config: Res<TaikoConfig>,
 ) {
-    for &onpu in FETCHED_ONPU.iter() {
+    for (idx, &onpu) in FETCHED_ONPU.iter().enumerate() {
         match *onpu {
             Onpu::Don(fraction) => {
                 commands.spawn((
@@ -133,7 +133,7 @@ fn spawn_onpu(
                         taiko_config.start_offset
                             + fraction.at() * taiko_config.scroll_speed / BPS * BEATS_PER_SHOUSETSU,
                         0.,
-                        0.,
+                        idx as f32,
                     )),
                     onpu.clone(),
                 ));
@@ -145,7 +145,7 @@ fn spawn_onpu(
                         taiko_config.start_offset
                             + fraction.at() * taiko_config.scroll_speed / BPS * BEATS_PER_SHOUSETSU,
                         0.,
-                        0.,
+                        idx as f32,
                     )),
                     onpu.clone(),
                 ));
