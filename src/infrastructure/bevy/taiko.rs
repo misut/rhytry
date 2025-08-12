@@ -40,7 +40,7 @@ pub struct OnpuQueue(pub VecDeque<Entity>);
 #[derive(Resource, Default)]
 pub struct CurrentTaikoState(pub TaikoState);
 
-#[derive(Resource)]
+#[derive(Clone, Resource)]
 pub struct TaikoConfig {
     pub scroll_speed: f32,
     pub start_offset: f32,
@@ -61,7 +61,7 @@ impl Plugin for TaikoPlugin {
             .init_resource::<CurrentTaikoState>()
             .init_resource::<TaikoConfig>()
             .add_systems(OnEnter(AppState::PlayingTaiko), (setup_taiko, spawn_onpu))
-            .add_systems(Update, (hit_onpu, move_onpu, push_onpu_to_queue, update_taiko_state));
+            .add_systems(Update, (hit_onpu, move_onpu, push_onpu_to_queue, update_taiko_state, update_taiko_config));
     }
 }
 
@@ -107,6 +107,16 @@ fn setup_taiko(
         Mesh2d(meshes.add(Rectangle::new(50000.0, window_size.y * 0.3))),
         MeshMaterial2d(materials.add(Color::linear_rgb(0.01, 0.01, 0.1))),
         Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
+    ));
+
+    commands.spawn((
+        Text::default(),
+        Node {
+            position_type: PositionType::Absolute,
+            top: Val::Px(12.0),
+            left: Val::Px(12.0),
+            ..default()
+        },
     ));
 }
 
@@ -177,4 +187,28 @@ fn hit_onpu(
             println!("No more onpus to hit!");
         }
     }
+}
+
+fn update_taiko_config(
+    keycode: Res<ButtonInput<KeyCode>>,
+    mut taiko_config: ResMut<TaikoConfig>,
+    mut text: Query<&mut Text>,
+) {
+    if keycode.just_pressed(KeyCode::ArrowUp) {
+        taiko_config.scroll_speed += 100.;
+    }
+
+    if keycode.just_pressed(KeyCode::ArrowDown) {
+        taiko_config.scroll_speed -= 100.;
+    }
+
+    match text.single_mut() {
+        Ok(mut text) => {
+            text.0 = "Current Config:\n".to_string();
+            text.push_str(&format!("Scroll speed: {}\n", taiko_config.scroll_speed));
+            text.push_str(&format!("Start offset: {}\n", taiko_config.start_offset));
+        }
+        Err(_) => {}
+    }
+
 }
